@@ -32,7 +32,6 @@ delimiter $$
 create procedure find_prices(
 )
 BEGIN
-
 	select MAX(buyPrice), MIN(buyPrice) from products;
 END$$
 delimiter ;
