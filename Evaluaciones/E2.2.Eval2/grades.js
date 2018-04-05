@@ -39,9 +39,39 @@ db.createCollection("grades")
   ]) // = { "student_id" : 18, "class_id" : 8 }, "PromedioCalif" : 10.206653332610028 }
 
 // 5) ¿Cuál es la materia en la que se han dejado más tareas?
-
+  db.grades.mapReduce(
+    function() {
+      var qty = 0;
+      for(var i = 0; i < this.scores.length; ++i) {
+          if(this.scores[i].type == "homework") {
+              qty++;
+          }
+      };
+      emit(this.class_id, qty);
+    }
+    function(key, values) {
+      var mat = 0;
+      for(var i = 0; i < values.length; ++i) {
+          if(values[i] > mat) {
+              max = values[i];
+          }
+      };
+      return mat;
+    }
+    {
+      out: "HW"
+    }
+  )
 
 // 6) ¿Qué alumno se inscribió en más cursos?
+  db.grades.aggregate([ {
+    {$group: {
+      _id: "$student_id",
+      Cursos: {$sum: 1}},
+    },
+    {$sort: {Cursos: -1}},
+    {$limit: 1}
+  ])
 
 // 7) ¿Cuál fue el curso que tuvo más reprobados?
   db.grades.aggregate([
